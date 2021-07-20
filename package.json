@@ -8,7 +8,6 @@
         "start": "npm run build"
     },
     "devDependencies": {
-        "@types/three": "^0.129.1",
         "@babel/core": "^7.14.6",
         "@babel/preset-env": "^7.14.7",
         "babel-loader": "^8.2.2",
