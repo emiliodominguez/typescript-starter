@@ -1,106 +1,95 @@
-const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCSSExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+import { resolve } from "path";
+import CopyWebpackPlugin from "copy-webpack-plugin";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCSSExtractPlugin from "mini-css-extract-plugin";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 
-module.exports = {
-    // Entry files
-    entry: {
-        main: [
-            path.resolve(__dirname, "../src/ts/index.ts"),
-            path.resolve(__dirname, "../src/scss/main.scss")
-        ],
-    },
+const { loader } = MiniCSSExtractPlugin;
 
-    // Output bundles (location)
-    output:
-    {
-        filename: "bundle.[contenthash].js",
-        path: path.resolve(__dirname, "../dist")
-    },
+export default {
+	entry: {
+		main: [resolve(process.env.PWD, "./src/ts/index.ts"), resolve(process.env.PWD, "./src/scss/main.scss")]
+	},
+	output: {
+		filename: "bundle.[contenthash].js",
+		path: resolve(process.env.PWD, "./dist")
+	},
+	resolve: {
+		extensions: [".ts", ".tsx", ".js", ".jsx"]
+	},
+	stats: "errors-only",
+	module: {
+		rules: [
+			// HTML
+			{
+				test: /\.(html)$/,
+				use: ["html-loader"]
+			},
 
-    // File extensions
-    resolve: {
-        extensions: [".ts", ".tsx", ".js", ".jsx"]
-    },
+			// Typescript
+			{
+				test: /\.(ts|tsx)$/,
+				exclude: /node_modules/,
+				use: ["ts-loader"]
+			},
 
-    // Stats log
-    stats: "errors-only",
+			// JS
+			{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				use: ["babel-loader"]
+			},
 
-    // Loaders
-    module: {
-        rules: [
-            // HTML
-            {
-                test: /\.(html)$/,
-                use: ["html-loader"]
-            },
+			// CSS
+			{
+				test: /\.(c|sc|sa)ss$/,
+				use: [loader, "css-loader", "sass-loader"]
+			},
 
-            // Typescript
-            {
-                test: /\.(ts|tsx)$/,
-                exclude: /node_modules/,
-                use: ["ts-loader"]
-            },
+			// Images
+			{
+				test: /\.(jpg|png|gif|svg)$/,
+				use: [
+					{
+						loader: "file-loader",
+						options: {
+							outputPath: "assets/images"
+						}
+					}
+				]
+			},
 
-            // JS
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: ["babel-loader"]
-            },
+			// Fonts
+			{
+				test: /\.(ttf|eot|woff|woff2)$/,
+				use: [
+					{
+						loader: "file-loader",
+						options: {
+							outputPath: "assets/fonts"
+						}
+					}
+				]
+			}
+		]
+	},
+	plugins: [
+		new CopyWebpackPlugin({
+			patterns: [
+				{
+					from: resolve(process.env.PWD, "./src/assets"),
+					noErrorOnMissing: true
+				}
+			]
+		}),
 
-            // CSS
-            {
-                test: /\.(c|sc|sa)ss$/,
-                use: [MiniCSSExtractPlugin.loader, "css-loader", "sass-loader"]
-            },
+		new HtmlWebpackPlugin({
+			template: resolve(process.env.PWD, "./src/index.html"),
+			minify: true
+		}),
 
-            // Images
-            {
-                test: /\.(jpg|png|gif|svg)$/,
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: {
-                            outputPath: "assets/images",
-                        },
-                    },
-                ]
-            },
+		new MiniCSSExtractPlugin(),
 
-            // Fonts
-            {
-                test: /\.(ttf|eot|woff|woff2)$/,
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: {
-                            outputPath: "assets/fonts",
-                        },
-                    },
-                ]
-            },
-        ],
-    },
-
-    // Plugins
-    plugins: [
-        new CopyWebpackPlugin({
-            patterns: [{
-                from: path.resolve(__dirname, "../src/assets"),
-                noErrorOnMissing: true
-            }]
-        }),
-
-        new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, "../src/index.html"),
-            minify: true
-        }),
-
-        new MiniCSSExtractPlugin(),
-
-        new CssMinimizerPlugin()
-    ],
+		new CssMinimizerPlugin()
+	]
 };

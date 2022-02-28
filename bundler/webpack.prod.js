@@ -1,14 +1,11 @@
-const { merge } = require("webpack-merge");
-const commonConfiguration = require("./webpack.common.js");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+import { merge } from "webpack-merge";
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import commonConfiguration from "./webpack.common.js";
 
-module.exports = merge(
-    commonConfiguration,
-    {
-        // Mode
-        mode: "production",
+export default merge(commonConfiguration, {
+	// Mode
+	mode: "production",
 
-        // Plugins
-        plugins: [new CleanWebpackPlugin()]
-    }
-);
+	// Plugins
+	plugins: [new CleanWebpackPlugin()]
+});
